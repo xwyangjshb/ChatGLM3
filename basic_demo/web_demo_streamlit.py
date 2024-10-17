@@ -24,12 +24,39 @@ st.set_page_config(
     layout="wide"
 )
 
+<<<<<<< HEAD:basic_demo/web_demo_streamlit.py
 
 @st.cache_resource
 def get_model():
 
     tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_PATH, trust_remote_code=True)
     model = AutoModel.from_pretrained(MODEL_PATH, trust_remote_code=True, device_map="auto").eval()
+=======
+# 设置为模型ID或本地文件夹路径
+#model_path = "THUDM/chatglm3-6b"
+
+import torch
+torch.backends.cuda.enable_flash_sdp(False)
+
+
+#model_path = "THUDM/chatglm3-6b"
+#model_path = "ZhipuAI/chatglm3-6b"
+#model_path = "/home/bvs/.cache/modelscope/hub/ZhipuAI/chatglm3-6b"
+#性能从好到低：6b-base 性能最好> Best Baseline > GLM2-base
+model_path = "/home/bvs/.cache/modelscope/hub/ZhipuAI/chatglm3-6b-base"
+
+
+@st.cache_resource
+def get_model():
+    tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+    #model = AutoModel.from_pretrained(model_path, trust_remote_code=True).cuda()
+    
+    # 多显卡支持,使用下面两行代替上面一行,将num_gpus改为你实际的显卡数量
+    from utils import load_model_on_gpus
+    model = load_model_on_gpus(model_path, num_gpus=2)
+    
+    model = model.eval()
+>>>>>>> dcf792f (支持4卡GPU):basic_demo/web_demo2.py
     return tokenizer, model
 
 

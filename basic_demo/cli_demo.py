@@ -2,6 +2,7 @@ import os
 import platform
 from transformers import AutoTokenizer, AutoModel
 
+<<<<<<< HEAD
 MODEL_PATH = os.environ.get('MODEL_PATH', 'THUDM/chatglm3-6b')
 TOKENIZER_PATH = os.environ.get("TOKENIZER_PATH", MODEL_PATH)
 
@@ -9,6 +10,37 @@ tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_PATH, trust_remote_code=True
 model = AutoModel.from_pretrained(MODEL_PATH, trust_remote_code=True, device_map="auto").eval()
 # add .quantize(bits=4, device="cuda").cuda() before .eval() to use int4 model
 # must use cuda to load int4 model
+=======
+
+import torch
+torch.backends.cuda.enable_flash_sdp(False)
+
+import os
+os.environ["PYTORCH_CUDA_ALLOC_CONF"]="max_split_size_mb:64"
+print(os.environ["PYTORCH_CUDA_ALLOC_CONF"])
+#model_path = "THUDM/chatglm3-6b"
+
+model_path = "/home/bvs/.cache/modelscope/hub/ZhipuAI/chatglm3-6b"
+
+model_path = "/home/bvs/.cache/modelscope/hub/ZhipuAI/chatglm3-6b-32k"
+
+tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+#model = AutoModel.from_pretrained(model_path, trust_remote_code=True).quantize(4).cuda()
+
+# 多显卡支持，使用下面两行代替上面一行，将num_gpus改为你实际的显卡数量
+from utils import load_model_on_gpus
+model = load_model_on_gpus(model_path, num_gpus=2)
+
+
+
+
+#model_path = "THUDM/chatglm3-6b"
+#model_path = "ZhipuAI/chatglm3-6b"
+#model_path = "/home/bvs/.cache/modelscope/hub/ZhipuAI/chatglm3-6b"
+
+
+model = model.eval()
+>>>>>>> dcf792f (支持4卡GPU)
 
 os_name = platform.system()
 clear_command = 'cls' if os_name == 'Windows' else 'clear'
